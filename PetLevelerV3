@@ -70,7 +70,7 @@ petInfo.BackgroundTransparency = 1
 petInfo.Position = UDim2.new(0, 14, 0, 48)
 petInfo.Size = UDim2.new(1, -28, 0, 24)
 petInfo.TextXAlignment = Enum.TextXAlignment.Left
-
+-- 
 -- Modern Button Function
 local function createButton(text, posY)
     local btn = Instance.new("TextButton", frame)
