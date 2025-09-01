@@ -1,0 +1,118 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+screenGui.Name = "KuniPetAgeLeveller"
+screenGui.ResetOnSpawn = false
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Main Frame
+local frame = Instance.new("Frame", screenGui)
+frame.Size = UDim2.new(0, 320, 0, 190)
+frame.Position = UDim2.new(0.5, -160, 0.5, -95)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BackgroundTransparency = 0.2
+frame.Active = true
+frame.Draggable = true
+frame.Name = "PetAgeFrame"
+
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 14)
+
+-- Frame Glow/Stroke
+local stroke = Instance.new("UIStroke", frame)
+stroke.Color = Color3.fromRGB(255, 255, 255)
+stroke.Thickness = 1.6
+stroke.Transparency = 0.6
+
+-- Gradient Background
+local gradient = Instance.new("UIGradient", frame)
+gradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 40, 40)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 20, 20))
+})
+gradient.Rotation = 90
+
+-- Title
+local title = Instance.new("TextLabel", frame)
+title.Text = "🦋 Pet Age Leveler 🦋"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 22
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.BackgroundTransparency = 1
+title.Size = UDim2.new(1, -40, 0, 32)
+title.Position = UDim2.new(0, 12, 0, 6)
+title.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Close Button
+local closeButton = Instance.new("TextButton", frame)
+closeButton.Text = "❌"
+closeButton.Font = Enum.Font.GothamBold
+closeButton.TextSize = 18
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+closeButton.BackgroundTransparency = 0.1
+closeButton.Size = UDim2.new(0, 28, 0, 28)
+closeButton.Position = UDim2.new(1, -36, 0, 8)
+Instance.new("UICorner", closeButton).CornerRadius = UDim.new(0, 8)
+
+closeButton.MouseButton1Click:Connect(function()
+    frame.Visible = false
+end)
+
+-- Equipped Pet Label
+local petInfo = Instance.new("TextLabel", frame)
+petInfo.Text = "Equipped Pet: [None]"
+petInfo.Font = Enum.Font.GothamMedium
+petInfo.TextSize = 16
+petInfo.TextColor3 = Color3.fromRGB(255, 230, 150)
+petInfo.BackgroundTransparency = 1
+petInfo.Position = UDim2.new(0, 14, 0, 48)
+petInfo.Size = UDim2.new(1, -28, 0, 24)
+petInfo.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Modern Button Function
+local function createButton(text, posY)
+    local btn = Instance.new("TextButton", frame)
+    btn.Text = text
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 16
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.BackgroundColor3 = Color3.fromRGB(60, 120, 255)
+    btn.BackgroundTransparency = 0.15
+    btn.Size = UDim2.new(0, 240, 0, 38)
+    btn.Position = UDim2.new(0.5, -120, 0, posY)
+
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 10)
+
+    local btnStroke = Instance.new("UIStroke", btn)
+    btnStroke.Color = Color3.fromRGB(255, 255, 255)
+    btnStroke.Thickness = 1.2
+    btnStroke.Transparency = 0.4
+
+    -- Hover effect
+    btn.MouseEnter:Connect(function()
+        btn.BackgroundColor3 = Color3.fromRGB(80, 140, 255)
+    end)
+    btn.MouseLeave:Connect(function()
+        btn.BackgroundColor3 = Color3.fromRGB(60, 120, 255)
+    end)
+
+    return btn
+end
+
+-- Buttons
+local button = createButton("Set Age to 50", 86)
+local addAgeButton = createButton("Add +1 Age", 132)
+
+-- Footer Label
+local footer = Instance.new("TextLabel", frame)
+footer.Text = ":Tiktok: @Uncle.Sam"
+footer.Font = Enum.Font.Gotham
+footer.TextSize = 13
+footer.TextColor3 = Color3.fromRGB(200, 200, 200)
+footer.BackgroundTransparency = 1
+footer.Size = UDim2.new(1, 0, 0, 20)
+footer.Position = UDim2.new(0, 0, 1, -22)
+
+-- (Functions + logic remain same below)
