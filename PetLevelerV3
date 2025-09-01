@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 
+-- ScreenGui
 local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 screenGui.Name = "KuniPetAgeLeveller"
 screenGui.ResetOnSpawn = false
@@ -16,7 +17,6 @@ frame.BackgroundTransparency = 0.2
 frame.Active = true
 frame.Draggable = true
 frame.Name = "PetAgeFrame"
-
 Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 14)
 
 -- Frame Glow/Stroke
@@ -115,4 +115,23 @@ footer.BackgroundTransparency = 1
 footer.Size = UDim2.new(1, 0, 0, 20)
 footer.Position = UDim2.new(0, 0, 1, -22)
 
--- (Functions + logic remain same below)
+-- Function to get equipped pet tool
+local function getEquippedPetTool()
+    character = player.Character or player.CharacterAdded:Wait()
+    for _, child in pairs(character:GetChildren()) do
+        if child:IsA("Tool") and child.Name:find("Age") then
+            return child
+        end
+    end
+    return nil
+end
+
+-- Update GUI pet name
+local function updateGUI()
+    local pet = getEquippedPetTool()
+    if pet then
+        petInfo.Text = "Equipped Pet: " .. pet.Name
+    else
+        petInfo.Text = "Equipped Pet: [None]"
+    end
+e
