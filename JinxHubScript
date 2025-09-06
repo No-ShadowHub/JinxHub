@@ -1,0 +1,15 @@
+local success1, err1 = pcall(function()
+    loadstring(game:HttpGet("https://pastefy.app/kIp2JPXK/raw"))()
+end)
+
+if not success1 then
+    warn("Failed to load first script:", err1)
+end
+
+local success2, err2 = pcall(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Jinx-Script/new-visual/main/new-visual.lua"))()
+end)
+
+if not success2 then
+    warn("Failed to load second script:", err2)
+end
